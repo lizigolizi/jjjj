@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulsePredict - AI Cryptocurrency Predictions</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #4fb5f0 0%, #2980b9 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeOut 3s ease-in-out forwards;
+        }
+        
+        .splash-logo {
+            width: 300px;
+            opacity: 0;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
+            animation: fadeIn 1s ease-in-out 0.5s forwards, pulse 2s infinite alternate;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+        
+        @keyframes fadeOut {
+            0%, 70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+        
+        header {
+            background: linear-gradient(to right, #4fb5f0, #3498db);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            height: 50px;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.1));
+            transition: transform 0.3s;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropbtn {
+            background: linear-gradient(to right, #0a5688, #0d4d7a);
+            color: white;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(10, 86, 136, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .dropbtn:hover {
+            background: linear-gradient(to right, #0d4d7a, #0a5688);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(10, 86, 136, 0.4);
+        }
+        
+        .dropbtn:after {
+            content: "▼";
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 220px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 1;
+            border-radius: 10px;
+            max-height: 350px;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dropdown-content a {
+            color: #444;
+            padding: 14px 20px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #eee;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #f5f9fc;
+            color: #0a5688;
+            padding-left: 25px;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        .container {
+            padding: 40px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #333;
+            text-align: center;
+            position: relative;
+        }
+        
+        .dashboard-title:after {
+            content: "";
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, #4fb5f0, #3498db);
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+        
+        .graphs-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .graph-card {
+            flex: 1 1 45%;
+            min-width: 300px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .graph-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .graph-card h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .graph-card h2:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, #4fb5f0, #3498db);
+            border-radius: 2px;
+        }
+        
+        .graph-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #888;
+            margin: 15px 0;
+            border: 1px dashed #ddd;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .graph-placeholder:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .confidence-score {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 600;
+            margin: 40px 0;
+            color: #333;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .confidence-score:hover {
+            transform: translateY(-5px);
+        }
+        
+        .confidence-score:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, #4fb5f0, #3498db);
+        }
+        
+        .sources-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            max-height: 250px;
+            overflow-y: auto;
+            position: relative;
+            transition: transform 0.3s;
+        }
+        
+        .sources-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .sources-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 22px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .sources-container h2:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, #4fb5f0, #3498db);
+            border-radius: 2px;
+        }
+        
+        .sources-list {
+            list-style-type: none;
+        }
+        
+        .sources-list li {
+            margin-bottom: 15px;
+            padding-left: 22px;
+            position: relative;
+        }
+        
+        .sources-list li:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #4fb5f0;
+            border-radius: 50%;
+        }
+        
+        .sources-list a {
+            color: #0a5688;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding-bottom: 3px;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .sources-list a:hover {
+            color: #4fb5f0;
+            border-bottom: 2px solid #4fb5f0;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1e0f7;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4fb5f0;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .graphs-container {
+                flex-direction: column;
+            }
+            
+            .graph-card {
+                flex: 1 1 100%;
+            }
+            
+            .dashboard-title {
+                font-size: 24px;
+            }
+            
+            .confidence-score {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div class="splash-screen">
+        <img src="./images/pulsepredict-splash.png" alt="PulsePredict Logo Animation" class="splash-logo">
+    </div>
+
+    <!-- Header -->
+    <header>
+        <img src="./images/pulsepredict-logo.png" alt="PulsePredict Logo" class="logo">
+        <div class="dropdown">
+            <button class="dropbtn">Crypto Dashboard</button>
+            <div class="dropdown-content">
+                <a href="#">Bitcoin (BTC)</a>
+                <a href="#">Ethereum (ETH)</a>
+                <a href="#">Solana (SOL)</a>
+                <a href="#">Cardano (ADA)</a>
+                <a href="#">Binance Coin (BNB)</a>
+                <a href="#">XRP (XRP)</a>
+                <a href="#">Dogecoin (DOGE)</a>
+                <a href="#">Polkadot (DOT)</a>
+                <a href="#">Avalanche (AVAX)</a>
+                <a href="#">Polygon (MATIC)</a>
+                <a href="#">Litecoin (LTC)</a>
+                <a href="#">Chainlink (LINK)</a>
+                <a href="#">Stellar (XLM)</a>
+                <a href="#">Uniswap (UNI)</a>
+                <a href="#">Tron (TRX)</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1 class="dashboard-title">Cryptocurrency Market Intelligence</h1>
+        
+        <div class="graphs-container">
+            <div class="graph-card">
+                <h2>Current Cryptocurrency Rates</h2>
+                <div class="graph-placeholder">Graph Placeholder: Current Rates</div>
+            </div>
+            <div class="graph-card">
+                <h2>Predicted Cryptocurrency Rates</h2>
+                <div class="graph-placeholder">Graph Placeholder: AI Predictions</div>
+            </div>
+        </div>
+
+        <div class="confidence-score">
+            Prediction Confidence Score: Placeholder
+        </div>
+
+        <div class="sources-container">
+            <h2>Sources Used by AI:</h2>
+            <ul class="sources-list">
+                <li><a href="https://www.reddit.com" target="_blank">Reddit</a></li>
+                <li><a href="https://newsapi.org" target="_blank">NewsAPI</a></li>
+                <li><a href="https://www.coindesk.com" target="_blank">CoinDesk</a></li>
+                <li><a href="https://decrypt.co" target="_blank">Decrypt</a></li>
+                <li><a href="https://cryptopanic.com" target="_blank">CryptoPanic</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Simulate splash screen and transition
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.querySelector('.splash-screen').style.display = 'none';
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
